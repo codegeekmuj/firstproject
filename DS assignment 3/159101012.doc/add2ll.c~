@@ -1,0 +1,142 @@
+#include<stdlib.h>
+#include<stdio.h>
+ 
+struct node
+{
+	int data;
+	struct node *ptr;
+} Node;
+ 
+ 
+int length( Node * t )
+{
+	int len = 0;
+	Node * current  = t;
+	while(current)
+        {
+		len++;
+		current = current->ptr;
+	}
+	return len;
+}
+ 
+Node * createNode(int value)
+{
+ 
+	Node * newNode = (Node *)malloc(sizeof(Node));
+	newNode->data = value;
+	newNode->ptr = NULL;
+ 
+	return newNode;
+ 
+}
+
+void push(Node **t, int value)
+{
+ 
+	Node *newNode = createNode (value);
+	if(!(*t) )
+        {
+		*t = newNode;
+	}
+	else
+        {
+		newNode->ptr = (*t);
+		*t = newNode;
+	}
+}
+ 
+void addTwoNumbers(Node *L1, Node *L2, int *carry, Node  **result)
+{
+	int len1 = length( L1 );
+	int len2 = length( L2 );
+	int diff = 0;
+ 
+	if(len1 < len2)
+    {
+		Node * current = L1;
+		L1 = L2;
+		L2 = current;
+    }
+    diff = abs(len1-len2);
+    Node * current = L1;
+ 
+    while(diff--)
+    	current = current->ptr;
+ 
+    addListRecursively(current, L2, carry, result);
+ 
+    diff = abs(len1-len2);
+ 
+    addRemainingDigits(L1, carry, result, diff);
+ 
+    if(*carry)
+    {
+    	push(result, *carry);
+    }
+    return;
+}
+void addListRecursively(Node *L1, Node *L2, int *carry, Node **result)
+{ 
+        int sum;
+        if(!L1)
+            return;
+ 
+        addListRecursively(L1->ptr, L2->ptr, carry, result);
+ 
+        sum = L1->data + L2->data + (*carry);
+ 
+        int value = sum%10;
+		*carry = sum/10;
+        push(result, value);
+ 
+        return;
+}
+void addRemainingDigits(Node *L1, int *carry, Node **result, int diff)
+{
+	int sum =0;
+ 
+	if(!L1 || !diff)
+		return;
+	addRemainingDigits(L1->ptr, carry, result, diff-1);
+ 
+	sum = L1->data + (*carry);
+	int value = sum%10;
+	*carry = sum/10;
+ 
+    push(result, value);
+ 
+    return;
+}
+ 
+void printList( Node * t )
+{
+	Node * current = t;
+	while(current)
+        {
+		printf("%d ->", current->data);
+		current = current->ptr;
+	}
+	printf("NULL");
+}
+int main()
+{
+        Node * L1 = NULL;
+        Node * L2 = NULL;
+        Node * result = NULL;
+        int carry = 0 ;
+        push(&L1,3);
+        push(&L1,4);
+        push(&L1,6);
+        push(&L1,7);
+        push(&L2,8);
+        push(&L2,9);
+        push(&L2,7);
+        printList(L1);
+        printf("\n");
+        printList(L2);
+        addTwoNumbers(L1,L2, &carry, &result);
+        printf("\n");
+        printList(result);
+        return 0;
+}
